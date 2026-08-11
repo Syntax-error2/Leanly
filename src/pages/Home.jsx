@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, SlidersHorizontal, Bell, Plus, Heart } from 'lucide-react';
+import { Search, SlidersHorizontal, Bell, Plus, Heart, Flame } from 'lucide-react';
 import LogMealModal from '../components/LogMealModal';
 import AddActivityModal from '../components/AddActivityModal';
 import { db } from '../db/db';
