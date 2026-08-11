@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" fill="none">
+  <circle cx="100" cy="80" r="72" fill="#3A9900"/>
+  <path d="M100 135C73 121 53 88 60 55C80 61 86 88 100 135Z" fill="#FFFFFF"/>
+  <path d="M100 135C127 121 147 88 140 55C120 61 114 88 100 135Z" fill="#FFFFFF"/>
+  <path d="M100 88C86 68 86 41 100 28C114 41 114 68 100 88Z" fill="#FFFFFF"/>
+  
+  <text x="100" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="48" font-weight="700" fill="#151515" text-anchor="middle">Leanly</text>
+</svg>

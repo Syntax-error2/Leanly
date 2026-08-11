@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Leanly</string>
+    <string name="title_activity_main">Leanly</string>
+    <string name="package_name">com.leanly.app</string>
+    <string name="custom_url_scheme">com.leanly.app</string>
+</resources>
