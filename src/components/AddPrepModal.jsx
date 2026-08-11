@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Search, ChefHat } from 'lucide-react';
 import { mealDictionary } from '../data/mealDictionary';
 import { db } from '../db/db';
+import { generateRecipeDetails } from '../utils/recipeGenerator';
 
 export default function AddPrepModal({ isOpen, onClose }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,38 +15,32 @@ export default function AddPrepModal({ isOpen, onClose }) {
     const totalMins = parseInt(timeStr.replace(/\D/g, '')) || 10;
     
     const newTasks = [];
-    
-    // Add specific detailed tasks based on tags/category
-    const est0 = 2; // Time to gather ingredients
-    const est1 = Math.max(2, Math.floor(totalMins * 0.15));
-    const est2 = Math.max(3, Math.floor(totalMins * 0.35));
-    const est3 = Math.max(3, Math.floor(totalMins * 0.40));
-    const est4 = Math.max(2, Math.floor(totalMins * 0.10));
+    const { ingredients, steps } = generateRecipeDetails(meal);
 
-    // Common Step:
-    newTasks.push({ text: `Gather ingredients: ${mealName} components, aromatics, and spices`, completed: false, timeEstimate: est0, category: meal.category });
+    // 1. Gather Ingredients Step
+    newTasks.push({ 
+        text: `Gather ingredients: ${ingredients.join(', ')}`, 
+        completed: false, 
+        timeEstimate: Math.max(2, Math.floor(totalMins * 0.10)), 
+        category: meal.category 
+    });
 
-    if (meal.tags?.includes('Fruit')) {
-        newTasks.push({ text: `Wash and inspect ${mealName} thoroughly`, completed: false, timeEstimate: est1, category: meal.category });
-        newTasks.push({ text: `Peel, core, or destem as needed`, completed: false, timeEstimate: est2, category: meal.category });
-        newTasks.push({ text: `Chop into bite-sized uniform portions`, completed: false, timeEstimate: est3, category: meal.category });
-        newTasks.push({ text: `Store in airtight container with lemon juice`, completed: false, timeEstimate: est4, category: meal.category });
-    } else if (meal.tags?.includes('Veggie')) {
-        newTasks.push({ text: `Wash vegetables and pat dry`, completed: false, timeEstimate: est1, category: meal.category });
-        newTasks.push({ text: `Chop and prep aromatics (garlic/onions)`, completed: false, timeEstimate: est2, category: meal.category });
-        newTasks.push({ text: `Blanch or lightly steam ${mealName}`, completed: false, timeEstimate: est3, category: meal.category });
-        newTasks.push({ text: `Ice bath and pack into containers`, completed: false, timeEstimate: est4, category: meal.category });
-    } else if (meal.tags?.includes('Protein') || mealName.toLowerCase().match(/chicken|pork|beef|fish|egg|shrimp/)) {
-        newTasks.push({ text: `Defrost and clean protein for ${mealName}`, completed: false, timeEstimate: est1, category: meal.category });
-        newTasks.push({ text: `Prepare marinade and aromatics`, completed: false, timeEstimate: est2, category: meal.category });
-        newTasks.push({ text: `Cook protein thoroughly to temp`, completed: false, timeEstimate: est3, category: meal.category });
-        newTasks.push({ text: `Let rest and portion into meal boxes`, completed: false, timeEstimate: est4, category: meal.category });
-    } else {
-        newTasks.push({ text: `Gather and measure all dry ingredients`, completed: false, timeEstimate: est1, category: meal.category });
-        newTasks.push({ text: `Prepare primary base for ${mealName}`, completed: false, timeEstimate: est2, category: meal.category });
-        newTasks.push({ text: `Combine and simmer to completion`, completed: false, timeEstimate: est3, category: meal.category });
-        newTasks.push({ text: `Cool down and pack into containers`, completed: false, timeEstimate: est4, category: meal.category });
-    }
+    // 2. Add individual steps, dynamically dividing the remaining time
+    const remainingTime = totalMins - Math.max(2, Math.floor(totalMins * 0.10));
+    const timePerStep = Math.max(2, Math.floor(remainingTime / steps.length));
+
+    steps.forEach((step, index) => {
+        // Last step takes whatever time is remaining to ensure it adds up
+        const isLast = index === steps.length - 1;
+        const stepTime = isLast ? remainingTime - (timePerStep * (steps.length - 1)) : timePerStep;
+
+        newTasks.push({ 
+            text: step, 
+            completed: false, 
+            timeEstimate: Math.max(1, stepTime), 
+            category: meal.category 
+        });
+    });
     
     await db.prepTasks.bulkAdd(newTasks);
     onClose();
