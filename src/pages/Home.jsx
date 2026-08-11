@@ -159,7 +159,7 @@ export default function Home() {
         </div>
         <div className="relative z-10 pr-12">
           <h3 className="font-bold text-white text-lg leading-tight mb-1">30-Min Brisk Walk</h3>
-          <p className="text-sm text-gray-400 font-medium">Burns ~150 kcal • Perfect after {mealSuggestion.category}</p>
+          <p className="text-sm text-gray-400 font-medium">Burns ~150 kcal • Perfect after a meal</p>
         </div>
         <div className="absolute top-1/2 -translate-y-1/2 right-4 w-10 h-10 bg-leanly-primary rounded-full flex items-center justify-center text-white shadow-soft transition-transform group-hover:scale-110">
           <Plus size={20} strokeWidth={3} />
