@@ -26,8 +26,8 @@ export default function Meals() {
     const matchesSearch = mealTitle.toLowerCase().includes(searchQuery.toLowerCase());
     
     let matchesFilter = true;
-    if (filterMode === 'Protein') matchesFilter = meal.protein > 20;
-    if (filterMode === 'Calorie') matchesFilter = meal.calories < 200;
+    if (filterMode === 'High Protein') matchesFilter = meal.protein > 20;
+    if (filterMode === 'Low Calorie') matchesFilter = meal.calories < 400;
 
     return matchesCategory && matchesSearch && matchesFilter;
   });
@@ -64,9 +64,11 @@ export default function Meals() {
         </div>
         <button
           onClick={() => {
-            if (filterMode === 'All') setFilterMode('Protein');
-            else if (filterMode === 'Protein') setFilterMode('Calorie');
-            else setFilterMode('All');
+            let nextMode = 'All';
+            if (filterMode === 'All') nextMode = 'High Protein';
+            else if (filterMode === 'High Protein') nextMode = 'Low Calorie';
+            setFilterMode(nextMode);
+            window.alert(`Filter applied: ${nextMode}`);
           }}
           className={`w-12 h-12 rounded-full flex items-center justify-center shadow-soft shrink-0 transition-colors ${filterMode !== 'All' ? 'bg-leanly-primary text-white' : 'bg-white text-leanly-text-primary'}`}
         >
@@ -125,7 +127,7 @@ export default function Meals() {
             onClick={() => setSelectedMeal(meal)}
           >
             <div className="relative w-full h-36 bg-leanly-50 rounded-2xl mb-4 overflow-hidden flex items-center justify-center">
-              <img src="/assets/logo.png" alt="Leanly" className="w-24 h-24 object-contain opacity-30 grayscale hover:grayscale-0 transition-all absolute" />
+              <img src="/logo.svg" alt="Leanly" className="w-24 h-24 object-contain opacity-30 grayscale hover:grayscale-0 transition-all absolute" />
               
               <button className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm">
                 <Heart size={16} className="text-leanly-text-muted" />

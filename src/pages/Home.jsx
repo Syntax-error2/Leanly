@@ -76,7 +76,7 @@ export default function Home() {
             <p className="text-lg text-leanly-text-primary font-semibold tracking-tight">Welcome Back</p>
           </div>
         </div>
-        <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-leanly-border text-leanly-text-secondary active:scale-95 transition-transform">
+        <button onClick={() => window.alert('No new notifications!')} className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-leanly-border text-leanly-text-secondary active:scale-95 transition-transform">
           <Bell size={20} />
         </button>
       </header>
@@ -96,7 +96,7 @@ export default function Home() {
             className="flex-1 bg-transparent border-none outline-none text-leanly-text-primary placeholder:text-leanly-text-muted text-base"
           />
         </div>
-        <button className="w-[50px] h-[50px] bg-white rounded-full flex items-center justify-center shadow-sm border border-leanly-border text-leanly-text-primary active:scale-95 transition-transform shrink-0">
+        <button onClick={() => window.alert('Advanced filters coming soon!')} className="w-[50px] h-[50px] bg-white rounded-full flex items-center justify-center shadow-sm border border-leanly-border text-leanly-text-primary active:scale-95 transition-transform shrink-0">
           <SlidersHorizontal size={20} />
         </button>
       </div>

@@ -55,6 +55,13 @@ export default function Profile() {
     }
   };
 
+  const handleEditName = async () => {
+    const newName = window.prompt("Enter your new name:", userProfile.name);
+    if (newName && newName.trim() !== "") {
+      await db.userProfile.update(userProfile.id, { name: newName.trim() });
+    }
+  };
+
   const menuItems = [
     { icon: <Heart size={20} />, label: 'Favorites', badge: favorites.length > 0 ? favorites.length.toString() : null },
     { icon: <Award size={20} />, label: 'Achievements', badge: achievements.length > 0 ? achievements.length.toString() : null },
@@ -70,7 +77,7 @@ export default function Profile() {
         <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary active:scale-95">
           <ChevronLeft size={20} />
         </button>
-        <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary active:scale-95">
+        <button onClick={handleEditName} className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary active:scale-95">
           <Edit2 size={20} />
         </button>
       </header>
