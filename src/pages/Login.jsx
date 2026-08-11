@@ -24,7 +24,10 @@ export default function Login() {
         </button>
       </header>
 
-      <div className="flex flex-col items-start mb-8">
+      <div className="flex flex-col items-center space-y-3 relative z-10 pt-4">
+        <div className="w-24 h-24 flex items-center justify-center drop-shadow-md mb-2">
+          <img src="/logo.svg" alt="Leanly Logo" className="w-24 h-24 object-contain" />
+        </div>
         <h1 className="text-[32px] font-bold text-leanly-text-primary leading-tight mb-2">Welcome Back</h1>
         <p className="text-leanly-text-secondary">Sign in to continue your journey.</p>
       </div>

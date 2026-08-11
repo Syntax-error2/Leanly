@@ -1,10 +1,36 @@
-import { useState } from 'react';
-import { X, Activity, Flame, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Activity, Flame, Clock, Navigation } from 'lucide-react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db/db';
 
 export default function AddActivityModal({ isOpen, onClose, onSave }) {
   const [activity, setActivity] = useState('');
   const [calories, setCalories] = useState('');
   const [duration, setDuration] = useState('');
+  const [distance, setDistance] = useState('');
+
+  const userProfile = useLiveQuery(() => db.userProfile.toCollection().first());
+  const weight = userProfile?.weight ? parseFloat(userProfile.weight) : 70;
+
+  useEffect(() => {
+    if (distance && Number(distance) > 0) {
+      // General formula: Distance (km) * Weight (kg) * 0.95
+      const calculatedCals = Math.round(Number(distance) * weight * 0.95);
+      if (calculatedCals > 0) setCalories(calculatedCals.toString());
+    } else if (duration && !distance && activity) {
+      // Rough duration based METs if distance not provided
+      let met = 5; // Default average activity
+      const act = activity.toLowerCase();
+      if (act.includes('run')) met = 9.8;
+      if (act.includes('walk')) met = 3.8;
+      if (act.includes('cycle') || act.includes('bike')) met = 7.5;
+      if (act.includes('lift') || act.includes('weight')) met = 4.5;
+      if (act.includes('yoga')) met = 2.5;
+
+      const calc = Math.round(met * weight * (Number(duration) / 60));
+      if (calc > 0) setCalories(calc.toString());
+    }
+  }, [distance, duration, activity, weight]);
 
   if (!isOpen) return null;
 
@@ -13,20 +39,23 @@ export default function AddActivityModal({ isOpen, onClose, onSave }) {
     onSave({
       type: activity,
       duration: Number(duration) || 0,
+      distance: Number(distance) || 0,
       calories: Number(calories),
       date: new Date().toISOString()
     });
     setActivity('');
     setCalories('');
     setDuration('');
+    setDistance('');
     onClose();
   };
 
   const quickActivities = [
-    { name: 'Running', cals: 300, icon: '🏃‍♂️' },
-    { name: 'Cycling', cals: 250, icon: '🚴‍♀️' },
-    { name: 'Weightlifting', cals: 200, icon: '🏋️‍♂️' },
-    { name: 'Yoga', cals: 150, icon: '🧘‍♀️' },
+    { name: 'Running', icon: '🏃‍♂️' },
+    { name: 'Cycling', icon: '🚴‍♀️' },
+    { name: 'Walking', icon: '🚶‍♂️' },
+    { name: 'Weightlifting', icon: '🏋️‍♂️' },
+    { name: 'Yoga', icon: '🧘‍♀️' },
   ];
 
   return (
@@ -51,7 +80,7 @@ export default function AddActivityModal({ isOpen, onClose, onSave }) {
           {quickActivities.map((qa, i) => (
             <button
               key={i}
-              onClick={() => { setActivity(qa.name); setCalories(qa.cals.toString()); setDuration('30'); }}
+              onClick={() => { setActivity(qa.name); setDuration('30'); }}
               className="flex-shrink-0 bg-leanly-background border border-gray-100 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 min-w-[100px] active:scale-95 transition-transform"
             >
               <span className="text-2xl">{qa.icon}</span>
@@ -75,16 +104,6 @@ export default function AddActivityModal({ isOpen, onClose, onSave }) {
 
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="block text-xs font-semibold text-leanly-text-secondary mb-1 uppercase tracking-wider flex items-center gap-1"><Flame size={14}/> Calories</label>
-              <input 
-                type="number" 
-                placeholder="0"
-                className="w-full bg-leanly-background rounded-2xl px-5 py-4 text-leanly-text-primary font-medium outline-none border border-transparent focus:border-leanly-primary"
-                value={calories}
-                onChange={(e) => setCalories(e.target.value)}
-              />
-            </div>
-            <div className="flex-1">
               <label className="block text-xs font-semibold text-leanly-text-secondary mb-1 uppercase tracking-wider flex items-center gap-1"><Clock size={14}/> Mins</label>
               <input 
                 type="number" 
@@ -94,6 +113,27 @@ export default function AddActivityModal({ isOpen, onClose, onSave }) {
                 onChange={(e) => setDuration(e.target.value)}
               />
             </div>
+            <div className="flex-1">
+              <label className="block text-xs font-semibold text-leanly-text-secondary mb-1 uppercase tracking-wider flex items-center gap-1"><Navigation size={14}/> Dist (km)</label>
+              <input 
+                type="number" 
+                placeholder="Optional"
+                className="w-full bg-leanly-background rounded-2xl px-5 py-4 text-leanly-text-primary font-medium outline-none border border-transparent focus:border-leanly-primary"
+                value={distance}
+                onChange={(e) => setDistance(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-semibold text-leanly-text-secondary mb-1 uppercase tracking-wider flex items-center gap-1"><Flame size={14}/> Calories Burned (Auto-calc)</label>
+            <input 
+              type="number" 
+              placeholder="0"
+              className="w-full bg-leanly-background rounded-2xl px-5 py-4 text-leanly-text-primary font-medium outline-none border border-transparent focus:border-leanly-primary"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+            />
           </div>
         </div>
 

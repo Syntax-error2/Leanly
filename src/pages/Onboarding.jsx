@@ -46,8 +46,8 @@ export default function Onboarding() {
 
       <div className="flex-1 flex flex-col items-center mt-10">
         <div className="flex flex-col items-center justify-center space-y-6">
-          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-soft">
-            <img src="/logo.png" alt="Leanly Logo" className="w-16 h-16 object-contain" />
+          <div className="w-24 h-24 flex items-center justify-center drop-shadow-md">
+            <img src="/logo.svg" alt="Leanly Logo" className="w-24 h-24 object-contain" />
           </div>
           <h1 className="text-5xl font-black tracking-tight text-leanly-text-primary">
             Leanly

@@ -110,8 +110,7 @@ export default function Home() {
               <span className="text-xs">+ Activity</span>
             </button>
             <div className="text-right flex items-baseline gap-1">
-              <span className="font-bold text-[#3A9900] text-lg leading-tight">{netCalories} / {goals.calories}</span>
-              <span className="font-bold text-[#3A9900] text-sm leading-tight">kcal</span>
+              <span className="font-bold text-[#3A9900] text-lg leading-tight whitespace-nowrap">{netCalories} / {goals.calories} kcal</span>
             </div>
           </div>
         </div>
@@ -149,6 +148,21 @@ export default function Home() {
               <div className="h-full bg-yellow-400 rounded-full transition-all duration-700" style={{width: getProgressWidth(totals.fat, goals.fat)}}></div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Suggested Activity */}
+      <div className="bg-[#121212] rounded-3xl p-5 shadow-sm relative overflow-hidden group active:scale-[0.98] transition-transform cursor-pointer border border-[#1e1e1e] mt-4 mb-2" onClick={() => setIsActivityModalOpen(true)}>
+        <div className="flex justify-between items-center bg-black text-white px-3 py-1.5 rounded-full w-max mb-3 shadow-sm border border-[#333]">
+          <Flame size={14} className="text-orange-500 mr-2" />
+          <span className="text-xs font-medium">Suggested Activity</span>
+        </div>
+        <div className="relative z-10 pr-12">
+          <h3 className="font-bold text-white text-lg leading-tight mb-1">30-Min Brisk Walk</h3>
+          <p className="text-sm text-gray-400 font-medium">Burns ~150 kcal • Perfect after {mealSuggestion.category}</p>
+        </div>
+        <div className="absolute top-1/2 -translate-y-1/2 right-4 w-10 h-10 bg-leanly-primary rounded-full flex items-center justify-center text-white shadow-soft transition-transform group-hover:scale-110">
+          <Plus size={20} strokeWidth={3} />
         </div>
       </div>
 

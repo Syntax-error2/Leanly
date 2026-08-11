@@ -85,7 +85,7 @@ export default function Meals() {
             {recommendedMeals.map((meal) => (
               <div key={`rec-${meal.id}`} className="bg-white rounded-3xl p-3 shadow-soft w-[160px] shrink-0 relative flex flex-col cursor-pointer active:scale-95 transition-transform" onClick={() => setSelectedMeal(meal)}>
                 <div className="w-full h-24 bg-leanly-50 rounded-2xl overflow-hidden mb-3 relative flex items-center justify-center">
-                  <img src="/assets/logo.png" alt="Leanly" className="w-16 h-16 object-contain opacity-50 grayscale hover:grayscale-0 transition-all" />
+                  <img src="/logo.svg" alt="Leanly" className="w-16 h-16 object-contain opacity-70 hover:opacity-100 transition-all" />
                 </div>
                 <h3 className="font-bold text-leanly-text-primary text-sm leading-tight mb-1 truncate">{meal.title}</h3>
                 <p className="text-xs font-bold text-leanly-primary">{meal.calories} kcal</p>
