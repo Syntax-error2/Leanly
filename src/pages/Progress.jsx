@@ -172,6 +172,7 @@ export default function Progress() {
                 </defs>
                 <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 'bold' }} />
                 <Tooltip 
+                  cursor={{ fill: 'transparent' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1F2937', color: 'white', fontWeight: 'bold' }}
                   itemStyle={{ color: '#CDEDBD' }}
                   formatter={(value) => [`${value} kcal`, 'Net Calories']}
