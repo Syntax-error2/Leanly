@@ -10,6 +10,14 @@ import ErrorBoundary from '../components/ErrorBoundary';
 export default function Progress() {
   const [activeTab, setActiveTab] = useState('Week');
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+  const [isModernDevice, setIsModernDevice] = useState(true);
+
+  useEffect(() => {
+    const match = navigator.userAgent.match(/Chrome\/(\d+)/);
+    if (match && parseInt(match[1], 10) < 85) {
+      setIsModernDevice(false);
+    }
+  }, []);
   
   const userProfile = useLiveQuery(() => db.userProfile.toCollection().first());
   const progressLogs = useLiveQuery(() => db.progress.orderBy('date').toArray()) || [];
@@ -174,12 +182,13 @@ export default function Progress() {
                   </defs>
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 'bold' }} />
                   <Tooltip 
-                    cursor={false}
+                    cursor={isModernDevice ? { fill: 'transparent' } : false}
+                    isAnimationActive={isModernDevice}
                     contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1F2937', color: 'white', fontWeight: 'bold' }}
                     itemStyle={{ color: '#CDEDBD' }}
                     formatter={(value) => [`${value} kcal`, 'Net Calories']}
                   />
-                  <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" />
+                  <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" isAnimationActive={isModernDevice} />
                 </AreaChart>
               </ResponsiveContainer>
             </ErrorBoundary>
