@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Heart, Clock, Flame, Plus, Sparkles, SlidersHorizontal } from 'lucide-react';
+import { Search, Heart, Clock, Flame, Plus, Sparkles, SlidersHorizontal, X } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import { mealDictionary } from '../data/mealDictionary';
@@ -10,7 +10,9 @@ export default function Meals() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [filterMode, setFilterMode] = useState('All'); // All, Protein, Calorie
-  
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [maxCalories, setMaxCalories] = useState(800);
+  const [minProtein, setMinProtein] = useState(0);  
   const userProfile = useLiveQuery(() => db.userProfile.toCollection().first());
   const goal = userProfile?.goal || 'Maintain Weight';
 
@@ -26,8 +28,11 @@ export default function Meals() {
     const matchesSearch = mealTitle.toLowerCase().includes(searchQuery.toLowerCase());
     
     let matchesFilter = true;
-    if (filterMode === 'High Protein') matchesFilter = meal.protein > 20;
-    if (filterMode === 'Low Calorie') matchesFilter = meal.calories < 400;
+    if (filterMode === 'High Protein') matchesFilter = meal.protein >= 20;
+    if (filterMode === 'Low Calorie') matchesFilter = meal.calories <= 400;
+    if (filterMode === 'Custom') {
+      matchesFilter = meal.calories <= maxCalories && meal.protein >= minProtein;
+    }
 
     return matchesCategory && matchesSearch && matchesFilter;
   });
@@ -57,20 +62,14 @@ export default function Meals() {
           <input 
             type="text" 
             placeholder="Search for recipes, ingredients..." 
-            className="flex-1 bg-transparent border-none outline-none text-leanly-text-primary placeholder:text-leanly-text-muted text-base"
+            className="flex-1 bg-transparent border-none outline-none text-leanly-text-primary dark:text-white placeholder:text-leanly-text-muted text-base"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         <button
-          onClick={() => {
-            let nextMode = 'All';
-            if (filterMode === 'All') nextMode = 'High Protein';
-            else if (filterMode === 'High Protein') nextMode = 'Low Calorie';
-            setFilterMode(nextMode);
-            window.alert(`Filter applied: ${nextMode}`);
-          }}
-          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-soft shrink-0 transition-colors ${filterMode !== 'All' ? 'bg-leanly-primary text-white' : 'bg-white text-leanly-text-primary'}`}
+          onClick={() => setIsFilterModalOpen(true)}
+          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-soft shrink-0 transition-colors ${filterMode !== 'All' ? 'bg-leanly-primary text-white' : 'bg-white dark:bg-gray-800 text-leanly-text-primary dark:text-white'}`}
         >
           <SlidersHorizontal size={20} />
         </button>
@@ -109,7 +108,7 @@ export default function Meals() {
             className={`whitespace-nowrap px-6 py-2.5 rounded-full font-medium transition-all active:scale-95 ${
               activeCategory === category 
                 ? 'bg-leanly-primary text-white shadow-soft' 
-                : 'bg-white text-leanly-text-secondary border border-leanly-border hover:bg-leanly-50'
+                : 'bg-white dark:bg-gray-800 text-leanly-text-secondary dark:text-gray-300 border border-leanly-border hover:bg-leanly-50 dark:hover:bg-gray-700'
             }`}
           >
             {category}
@@ -146,7 +145,7 @@ export default function Meals() {
 
             <div className="flex justify-between items-start">
               <div className="pr-10">
-                <h3 className="font-bold text-lg text-leanly-text-primary leading-tight mb-1">{meal.title}</h3>
+                <h3 className="font-bold text-lg text-leanly-text-primary dark:text-white leading-tight mb-1">{meal.title}</h3>
                 <div className="flex gap-1 flex-wrap mb-2">
                   {meal.tags?.map(tag => (
                     <span key={tag} className="text-[10px] font-bold uppercase tracking-wider text-leanly-primary bg-leanly-primary/10 px-2 py-0.5 rounded-full">
@@ -193,6 +192,80 @@ export default function Meals() {
           onClose={() => setSelectedMeal(null)} 
           initialData={selectedMeal} 
         />
+      )}
+
+      {/* Advanced Filters Modal */}
+      {isFilterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-gray-900 w-full rounded-t-[2rem] p-6 pb-12 animate-slide-up shadow-2xl relative">
+            <button 
+              onClick={() => setIsFilterModalOpen(false)}
+              className="absolute top-4 right-4 w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 active:scale-95 transition-transform"
+            >
+              <X size={20} />
+            </button>
+            <div className="w-12 h-12 bg-leanly-100 rounded-2xl flex items-center justify-center text-leanly-primary mb-4 mt-2">
+              <SlidersHorizontal size={24} />
+            </div>
+            
+            <h2 className="text-xl font-bold text-leanly-text-primary dark:text-white mb-6">Filter Meals</h2>
+            
+            <div className="mb-6">
+              <div className="flex justify-between mb-2">
+                <span className="font-bold text-leanly-text-secondary dark:text-gray-300">Max Calories</span>
+                <span className="font-bold text-leanly-primary">{maxCalories} kcal</span>
+              </div>
+              <input 
+                type="range" 
+                min="100" 
+                max="1200" 
+                step="50"
+                value={maxCalories} 
+                onChange={(e) => setMaxCalories(parseInt(e.target.value))}
+                className="w-full accent-leanly-primary" 
+              />
+            </div>
+
+            <div className="mb-8">
+              <div className="flex justify-between mb-2">
+                <span className="font-bold text-leanly-text-secondary dark:text-gray-300">Min Protein</span>
+                <span className="font-bold text-leanly-primary">{minProtein}g</span>
+              </div>
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                step="5"
+                value={minProtein} 
+                onChange={(e) => setMinProtein(parseInt(e.target.value))}
+                className="w-full accent-leanly-primary" 
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <button 
+                onClick={() => {
+                  setFilterMode('All');
+                  setMaxCalories(800);
+                  setMinProtein(0);
+                  setIsFilterModalOpen(false);
+                }}
+                className="flex-1 bg-gray-100 dark:bg-gray-800 text-leanly-text-primary dark:text-white py-4 rounded-[2rem] font-bold text-lg shadow-sm active:scale-95 transition-transform"
+              >
+                Clear
+              </button>
+              <button 
+                onClick={() => {
+                  setFilterMode('Custom');
+                  setIsFilterModalOpen(false);
+                }}
+                className="flex-[2] bg-leanly-primary text-white py-4 rounded-[2rem] font-bold text-lg shadow-soft active:scale-95 transition-transform"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

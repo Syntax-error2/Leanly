@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Settings, LogOut, ChevronRight, Info, Heart, Award, ChevronLeft, Edit2, Camera, X, Moon, Sun, Mail } from 'lucide-react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export default function Profile() {
   const fileInputRef = useRef(null);
   const [modalTitle, setModalTitle] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
   
   const userProfile = useLiveQuery(() => db.userProfile.toCollection().first());
   const favorites = useLiveQuery(() => db.favorites.toArray()) || [];
@@ -30,10 +31,13 @@ export default function Profile() {
     seedAchievements();
   }, []);
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    if (!isDarkMode) document.documentElement.classList.add('dark');
+  const toggleDarkMode = async () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('darkMode', newMode);
+    if (newMode) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
+    try { await Haptics.impact({ style: ImpactStyle.Light }); } catch (e) {}
   };
 
   const handleSignOut = async () => {
@@ -73,13 +77,18 @@ export default function Profile() {
 
   return (
     <div className="flex-1 overflow-y-auto pb-24 bg-leanly-background">
-      <header className="flex justify-between items-center p-6 pt-10">
-        <button className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary active:scale-95">
+      <header className="flex justify-between items-center p-6 pt-10 dark:bg-leanly-nav">
+        <button className="w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary dark:text-white active:scale-95 transition-transform">
           <ChevronLeft size={20} />
         </button>
-        <button onClick={handleEditName} className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary active:scale-95">
-          <Edit2 size={20} />
-        </button>
+        <div className="flex gap-3">
+          <button onClick={toggleDarkMode} className="w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary dark:text-white active:scale-95 transition-transform">
+            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <button onClick={handleEditName} className="w-10 h-10 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm text-leanly-text-primary dark:text-white active:scale-95 transition-transform">
+            <Edit2 size={20} />
+          </button>
+        </div>
       </header>
 
       <div className="px-6 flex flex-col items-center mb-8">
@@ -205,14 +214,9 @@ export default function Profile() {
             )}
             {modalTitle === 'Settings' && (
               <div className="mt-4 flex flex-col gap-3">
-                <div className="bg-leanly-background p-4 rounded-2xl flex justify-between items-center cursor-pointer" onClick={toggleDarkMode}>
-                  <div className="flex items-center gap-3">
-                    {isDarkMode ? <Moon size={20} className="text-leanly-primary" /> : <Sun size={20} className="text-leanly-primary" />}
-                    <span className="font-bold text-leanly-text-primary">Dark Mode</span>
-                  </div>
-                  <div className={`w-12 h-6 rounded-full p-1 transition-colors ${isDarkMode ? 'bg-leanly-primary' : 'bg-gray-300'}`}>
-                    <div className={`w-4 h-4 rounded-full bg-white transition-transform ${isDarkMode ? 'translate-x-6' : ''}`}></div>
-                  </div>
+                <div className="bg-leanly-background dark:bg-gray-800 p-4 rounded-2xl flex justify-between items-center">
+                  <span className="font-bold text-leanly-text-primary dark:text-white">Version</span>
+                  <span className="text-gray-400">1.0.3</span>
                 </div>
               </div>
             )}

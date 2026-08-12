@@ -22,22 +22,10 @@ function App() {
         await LocalNotifications.schedule({
           notifications: [
             {
-              title: "Time for Breakfast! 🍳",
-              body: "Log your morning meal to start the day right.",
+              title: "Time to log your Lunch! 🍱",
+              body: "Keep your streak going and log your meals.",
               id: 1,
-              schedule: { on: { hour: 7, minute: 0 }, allowWhileIdle: true },
-            },
-            {
-              title: "Lunch Time! 🍱",
-              body: "Keep up the good work and log your lunch.",
-              id: 2,
               schedule: { on: { hour: 12, minute: 0 }, allowWhileIdle: true },
-            },
-            {
-              title: "Dinner Time! 🍽️",
-              body: "Finish the day strong. Don't forget to log your dinner.",
-              id: 3,
-              schedule: { on: { hour: 19, minute: 0 }, allowWhileIdle: true },
             }
           ]
         });
@@ -57,6 +45,16 @@ function App() {
   }, []);
 
   const [initialRoute, setInitialRoute] = useState(null);
+
+  useEffect(() => {
+    // Initialize Dark Mode
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
 
   useEffect(() => {
     const checkProfile = async () => {

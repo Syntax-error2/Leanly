@@ -3,6 +3,8 @@ import { Target, TrendingDown, ArrowLeft, Activity, Flame, Weight, Calendar } fr
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db/db';
 import AddActivityModal from '../components/AddActivityModal';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 
 export default function Progress() {
   const [activeTab, setActiveTab] = useState('Week');
@@ -71,13 +73,13 @@ export default function Progress() {
   if (!userProfile) return <div className="p-6">Loading progress...</div>;
 
   return (
-    <div className="flex-1 overflow-y-auto pb-24 bg-leanly-background">
+    <div className="flex-1 overflow-y-auto pb-24 bg-leanly-background dark:bg-gray-900">
       <header className="p-6 pt-10">
-        <h1 className="text-[28px] font-bold text-leanly-text-primary">Your progress</h1>
+        <h1 className="text-[28px] font-bold text-leanly-text-primary dark:text-white">Your progress</h1>
       </header>
 
       <div className="px-6 mb-6">
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold text-leanly-text-secondary mb-1">Current Weight</p>
             <div className="flex items-baseline gap-1">
@@ -130,12 +132,15 @@ export default function Progress() {
       </div>
 
       <div className="px-6 mb-6">
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm">
+        <div className="bg-white dark:bg-gray-800 rounded-[2rem] p-6 shadow-sm">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-leanly-text-primary">Recent Activity</h2>
+            <h2 className="text-xl font-bold text-leanly-text-primary dark:text-white">Recent Activity</h2>
             <button 
-              onClick={() => setIsActivityModalOpen(true)} 
-              className="text-sm font-bold text-leanly-primary bg-leanly-100 px-4 py-2 rounded-full active:scale-95 transition-transform"
+              onClick={() => {
+                try { Haptics.impact({ style: ImpactStyle.Light }); } catch(e) {}
+                setIsActivityModalOpen(true);
+              }} 
+              className="text-sm font-bold text-leanly-primary bg-leanly-100 dark:bg-gray-700 px-4 py-2 rounded-full active:scale-95 transition-transform"
             >
               Log Activity
             </button>
@@ -156,57 +161,24 @@ export default function Progress() {
           </div>
 
           {/* Line Chart */}
-          <div className="relative w-full h-40 mt-6 mb-2">
-            <svg viewBox="0 -10 300 120" className="w-full h-full overflow-visible">
-              <defs>
-                <linearGradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#3A9900" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#3A9900" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              
-              {(() => {
-                const points = weeklyData.map((d, i) => [i * 50, 100 - d.val]);
-                let pathD = `M ${points[0][0]} ${points[0][1]}`;
-                for (let i = 0; i < points.length - 1; i++) {
-                  const p0 = points[i];
-                  const p1 = points[i+1];
-                  const cp1x = p0[0] + 25;
-                  const cp2x = p1[0] - 25;
-                  pathD += ` C ${cp1x} ${p0[1]}, ${cp2x} ${p1[1]}, ${p1[0]} ${p1[1]}`;
-                }
-                const fillD = `${pathD} L 300 100 L 0 100 Z`;
-
-                return (
-                  <>
-                    <path d={fillD} fill="url(#lineGradient)" />
-                    <path d={pathD} fill="none" stroke="#3A9900" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                    {points.map((p, i) => (
-                      <circle key={i} cx={p[0]} cy={p[1]} r="4" fill="#fff" stroke="#3A9900" strokeWidth="2" />
-                    ))}
-                  </>
-                );
-              })()}
-            </svg>
-            
-            {/* Tooltip for active day */}
-            {weeklyData.map((d, i) => d.active && (
-              <div 
-                key={i} 
-                className="absolute bg-black text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-md z-10 animate-fade-in -translate-x-1/2"
-                style={{ left: `${(i / 6) * 100}%`, top: `${(100 - d.val)}%`, marginTop: '-35px' }}
-              >
-                {d.label}
-                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-black rotate-45"></div>
-              </div>
-            ))}
-          </div>
-
-          {/* X Axis Labels */}
-          <div className="flex justify-between items-center text-[10px] font-bold text-gray-400 px-1">
-            {weeklyData.map((d, i) => (
-              <span key={i}>{d.day}</span>
-            ))}
+          <div className="relative w-full h-48 mt-6">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorNetCals" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3A9900" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3A9900" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 'bold' }} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1F2937', color: 'white', fontWeight: 'bold' }}
+                  itemStyle={{ color: '#CDEDBD' }}
+                  formatter={(value) => [`${value} kcal`, 'Net Calories']}
+                />
+                <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

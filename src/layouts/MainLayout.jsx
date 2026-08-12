@@ -11,7 +11,7 @@ export default function MainLayout() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-leanly-background pb-32">
+    <div className="relative min-h-screen bg-leanly-background dark:bg-gray-900 pb-32 transition-colors">
       <main className="h-full">
         <Outlet />
       </main>
