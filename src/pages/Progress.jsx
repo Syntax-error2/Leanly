@@ -5,6 +5,7 @@ import { db } from '../db/db';
 import AddActivityModal from '../components/AddActivityModal';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 export default function Progress() {
   const [activeTab, setActiveTab] = useState('Week');
@@ -162,24 +163,27 @@ export default function Progress() {
 
           {/* Line Chart */}
           <div className="relative w-full h-48 mt-6">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorNetCals" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3A9900" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#3A9900" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 'bold' }} />
-                <Tooltip 
-                  cursor={{ fill: 'transparent' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1F2937', color: 'white', fontWeight: 'bold' }}
-                  itemStyle={{ color: '#CDEDBD' }}
-                  formatter={(value) => [`${value} kcal`, 'Net Calories']}
-                />
-                <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" />
-              </AreaChart>
-            </ResponsiveContainer>
+            <ErrorBoundary>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorNetCals" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3A9900" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#3A9900" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 'bold' }} />
+                  <Tooltip 
+                    cursor={false}
+                    isAnimationActive={false}
+                    contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1F2937', color: 'white', fontWeight: 'bold' }}
+                    itemStyle={{ color: '#CDEDBD' }}
+                    formatter={(value) => [`${value} kcal`, 'Net Calories']}
+                  />
+                  <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" isAnimationActive={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ErrorBoundary>
           </div>
         </div>
       </div>
