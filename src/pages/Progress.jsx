@@ -175,12 +175,11 @@ export default function Progress() {
                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#9CA3AF', fontWeight: 'bold' }} />
                   <Tooltip 
                     cursor={false}
-                    isAnimationActive={false}
                     contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1F2937', color: 'white', fontWeight: 'bold' }}
                     itemStyle={{ color: '#CDEDBD' }}
                     formatter={(value) => [`${value} kcal`, 'Net Calories']}
                   />
-                  <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" isAnimationActive={false} />
+                  <Area type="monotone" dataKey="raw" stroke="#3A9900" strokeWidth={3} fillOpacity={1} fill="url(#colorNetCals)" />
                 </AreaChart>
               </ResponsiveContainer>
             </ErrorBoundary>
